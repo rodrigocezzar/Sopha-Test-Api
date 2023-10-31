@@ -4,25 +4,23 @@ module Api
   module V1
     class UsersController < ApplicationController
       before_action :authorized, except: [:create]
-      before_action :set_user, only: %i[show update destroy]
+      # before_action :set_user, only: %i[show update destroy]
 
       def index
-        @users = User.all
-
-        render json: @users
+        @users = User.page(params[:page]).per(5)
       end
 
       def show
-        render json: @user
+        @user = User.where(id: params[:id]).page(params[:page]).per(5)
       end
 
       def create
         @user = User.new(user_params)
 
-        if @user.save
-          render json: { status: 'User created successfully' }, status: :created
+        if User::CreateService.new(@user).call
+          render json: { message: 'Usuário Criado com Sucesso' }, status: :created
         else
-          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @user.errors }, status: :unprocessable_entity
         end
       end
 
@@ -41,10 +39,18 @@ module Api
       end
 
       def destroy
-        @user.destroy
+        @user = User.find_by(id: params[:id])
+
+        return render json: { errors: 'Usuário inexistente' }, status: :not_found if @user.nil?
+
+        render json: { message: '' }, status: :no_content if @user.destroy
       end
 
       private
+
+      def paginatable_model
+        User
+      end
 
       def set_user
         @user = User.find(params[:id])
