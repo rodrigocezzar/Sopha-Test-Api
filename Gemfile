@@ -23,6 +23,9 @@ gem 'bcrypt', '~> 3.1.7'
 # jwt
 gem 'jwt'
 
+# Paginador
+gem 'kaminari'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
@@ -36,6 +39,7 @@ group :development, :test do
   gem 'faker'
   gem 'rspec-expectations'
   gem 'rspec-rails'
+  gem 'rails-controller-testing'
   gem 'rubocop'
   gem 'shoulda-matchers'
 end
