@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class AuthenticationsController < ApplicationController
@@ -8,7 +10,7 @@ module Api
         if @user&.authenticate(params[:password])
           @token = JsonWebToken.jwt_encode({ user_id: @user.id })
           response.headers['Authorization'] = "Bearer #{@token}"
-          render :login, status: :ok
+          render :login, json: { message: 'Login efetuado com sucesso' }, status: :ok
         else
           render json: { error: 'Credenciais Inválidas' }, status: :unauthorized
         end

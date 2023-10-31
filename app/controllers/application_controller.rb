@@ -12,21 +12,21 @@ class ApplicationController < ActionController::API
   end
 
   def decoded_token
-    if auth_header
-      token = auth_header.split(' ')[1]
-      begin
-        JsonWebToken.jwt_decode(token)
-      rescue CustomError::InvalidToken
-        nil
-      end
+    return unless auth_header
+
+    token = auth_header.split(' ')[1]
+    begin
+      JsonWebToken.jwt_decode(token)
+    rescue CustomError::InvalidToken
+      nil
     end
   end
 
   def current_user
-    if decoded_token
-      user_id = decoded_token.is_a?(Array) ? decoded_token[0]['user_id'] : decoded_token['user_id']
-      @user = User.find_by(id: user_id)
-    end
+    return unless decoded_token
+
+    user_id = decoded_token.is_a?(Array) ? decoded_token[0]['user_id'] : decoded_token['user_id']
+    @user = User.find_by(id: user_id)
   end
 
   def logged_in?
@@ -34,9 +34,9 @@ class ApplicationController < ActionController::API
   end
 
   def authorized
-    unless logged_in?
-      render json: { aviso: 'É necessário efetuar o login antes de utilizar esse endpointttll' },
-             status: :unauthorized
-    end
+    return if logged_in?
+
+    render json: { aviso: 'É necessário efetuar o login antes de utilizar esse endpointttll' },
+           status: :unauthorized
   end
 end
